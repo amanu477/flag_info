@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Country Flags</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .flag {
+            width: 100%;
+            height: auto;
+            cursor: pointer;
+        }
+
+        #info {
+            grid-column: span 4; /* Full width on small screens */
+            padding: 20px;
+            border: 1px solid #ccc;
+            display: none;
+            margin-top: 20px; /* Add some space between flags and info on small screens */
+        }
+
+        #info img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        /* Media query for small screens */
+        @media (max-width: 600px) {
+            body {
+                grid-template-columns: 1fr; /* Single column on small screens */
+            }
+
+            #info {
+                grid-column: span 1; /* Full width on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="info"></div>
+
+<script>
+    const apiUrl = 'https://restcountries.com/v3.1/all';
+    const flagsContainer = document.body;
+
+    // Fetch country data from the API
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(country => {
+                const flag = document.createElement('img');
+                flag.src = country.flags.png;
+                flag.alt = country.name.common;
+                flag.classList.add('flag');
+
+                flag.addEventListener('click', () => displayCountryInfo(country));
+
+                flagsContainer.appendChild(flag);
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+
+    function displayCountryInfo(country) {
+        const infoContainer = document.getElementById('info');
+        infoContainer.innerHTML = `
+            <img src="${country.flags.png}" alt="${country.name.common}" style="max-width: 100%;">
+            <h2>${country.name.common}</h2>
+            <p>Capital: ${country.capital || 'N/A'}</p>
+            <p>Population: ${country.population || 'N/A'}</p>
+            <p>Region: ${country.region || 'N/A'}</p>
+            <p>Subregion: ${country.subregion || 'N/A'}</p>
+            <p>Calling Codes: ${country.callingCodes ? country.callingCodes.join(', ') : 'N/A'}</p>
+            <p>Alpha2 Code: ${country.cca2 || 'N/A'}</p>
+        `;
+
+        infoContainer.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
